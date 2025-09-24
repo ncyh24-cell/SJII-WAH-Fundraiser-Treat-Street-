@@ -1,0 +1,268 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAH 2025 Fundraiser - Powered by Google for Good & SJI International</title>
+  <style>
+    /* Custom CSS with Google-inspired modern design */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #ffffff;
+      line-height: 1.6;
+      margin: 0;
+      color: #202124;
+    }
+    .container {
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 20px;
+    }
+    .header {
+      background-color: #4285F4;
+      color: #ffffff;
+      padding: 15px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .header-nav a {
+      color: #ffffff;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .header-nav a:hover {
+      color: #DB4437;
+    }
+    .section {
+      padding: 60px 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background-color: #f8f9fa;
+    }
+    .section-hero {
+      background: linear-gradient(135deg, #4285F4 0%, #0F9D58 100%);
+      color: #ffffff;
+    }
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      color: #202124;
+    }
+    .overlay-hero {
+      background-color: rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+    }
+    .btn {
+      background-color: #4285F4;
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #DB4437;
+    }
+    .text-xl { font-size: 1.5rem; }
+    .text-2xl { font-size: 2rem; }
+    .text-3xl { font-size: 2.5rem; }
+    .font-bold { font-weight: 700; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 768px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    footer {
+      background-color: #202124;
+      color: #ffffff;
+      padding: 20px 0;
+      text-align: center;
+    }
+    ul {
+      text-align: left;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    iframe {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    a[href="https://www.wahfoundation.org/"] {
+      color: #4285F4;
+      text-decoration: none;
+    }
+    a[href="https://www.wahfoundation.org/"]:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container flex justify-between items-center">
+      <h1 class="text-2xl font-bold">WAH 2025 Fundraiser</h1>
+      <nav class="header-nav">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#event">Event</a>
+        <a href="#impact">Impact</a>
+        <a href="#preorder">Pre-Order</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="section section-hero">
+    <div class="overlay overlay-hero fade-in">
+      <h1 class="text-3xl font-bold mb-4">WAH 2025 Fundraiser</h1>
+      <p class="text-xl mb-6">Support clean water and healthcare in Kampong Chhnang, Cambodia, with Google for Good & SJI International.</p>
+      <a href="#preorder" class="btn">Pre-Order Now</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <div class="container fade-in">
+      <div class="overlay">
+        <h2 class="text-3xl font-bold mb-6">About WAH Foundation</h2>
+        <p class="text-xl text-gray-700 max-w-3xl mx-auto">The WAH Foundation, established in 2009, is a Cambodia-registered NGO dedicated to improving lives in rural Kampong Chhnang through clean water, healthcare, and education. With 340 water tanks installed, 400 midwives trained, and 34 women empowered through scholarships, WAH transforms communities. Learn more at <a href="https://www.wahfoundation.org/" target="_blank">wahfoundation.org</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Event Section -->
+  <section id="event" class="section">
+    <div class="container fade-in">
+      <h2 class="text-3xl font-bold mb-6">Treat Street Fundraiser</h2>
+      <div class="grid">
+        <div>
+          <p class="text-xl text-gray-700">Join 7BE1 Group 1 at SJI International's Treat Street for a variety of delicious treats and snacks. All proceeds support WAH's mission. Our goal: $100+.</p>
+          <p class="mt-4 font-bold">Price List:</p>
+          <ul class="text-xl text-gray-700 list-disc list-inside">
+            <li>Milo Dinosaur: $2.50</li>
+            <li>White Rabbit Candy: $1.00</li>
+            <li>Assorted Biscuits: $1.50</li>
+          </ul>
+        </div>
+        <div class="text-center">
+          <p class="text-xl text-gray-700">Enjoy refreshing treats while making a difference!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact Section -->
+  <section id="impact" class="section">
+    <div class="container fade-in">
+      <div class="overlay">
+        <h2 class="text-3xl font-bold mb-6">Our Impact</h2>
+        <p class="text-xl text-gray-700 max-w-3xl mx-auto">Your purchase funds clean water systems ($2,000 per tank), midwife training (over 90% reduced childbirth mortality), and scholarships. Help us raise $100 to transform lives in Kampong Chhnang.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pre-Order Section -->
+  <section id="preorder" class="section">
+    <div class="container fade-in">
+      <h2 class="text-3xl font-bold mb-6">Pre-Order Your Treats</h2>
+      <p class="text-xl text-gray-700 max-w-3xl mx-auto">Reserve your Milo Dinosaur, White Rabbit candy, or assorted biscuits. Pay and collect on October 5, 2025, at Treat Street.</p>
+      <p class="text-gray-700 mt-4"><strong>Expiry Date:</strong> November 1, 2025</p>
+      <div class="mt-6">
+        <iframe src="https://docs.google.com/forms/d/1dLCmR_vqpohz5_32D9sVbz888OTbIKQIoTUER26auhE/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0" class="rounded-lg"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 WAH Fundraiser by 7BE1 Group 1, SJI International. Powered by Google for Good.</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript for Fade-In Animation (Countdown removed) -->
+  <script>
+    // Fade-in effect when scrolling
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(element => {
+      observer.observe(element);
+    });
+  </script>
+</body>
+</html>
